@@ -1,0 +1,66 @@
+version: '0.0.{build}'
+
+init:
+  - ps: >-
+      if($env:appveyor_repo_tag -eq 'True') {
+        Update-AppveyorBuild -Version "$($env:APPVEYOR_REPO_TAG_NAME.TrimStart("v"))"
+      }
+
+configuration:
+  - Debug
+  - Release
+
+environment:
+  global:
+    PYTHON: "C:\\Python36"
+    CYG_ROOT: C:\cygwin64
+
+  matrix:
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017    
+    arch: x86
+    platform: Win32
+    visual_studio: Visual Studio 15 2017
+    compiler_toolset: v141
+    gtest: 1.7.0
+
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    arch: x86_64
+    platform: x64
+    visual_studio: Visual Studio 16 2019
+    compiler_toolset: v142
+    gtest: 1.10.0
+
+install:
+  - "SET PATH=%PYTHON%;%PYTHON%/Scripts/;%PATH%"
+  - pip.exe install conan
+  - conan user
+  - conan remote add systelab-public https://systelab.jfrog.io/artifactory/api/conan/cpp-conan-production-local
+  - conan --version
+
+before_build:
+  - conan export-pkg SFTPAdapterInterface/conanfile.py SFTPAdapterInterface/%APPVEYOR_BUILD_VERSION%@systelab/stable -s build_type=%CONFIGURATION% -s compiler.toolset=%COMPILER_TOOLSET% -s arch=%ARCH%
+  - md build
+  - cd build
+  - conan install ../SFTPAdapterInterfaceTestUtilities -s build_type=%CONFIGURATION% -s compiler.toolset=%COMPILER_TOOLSET% -s arch=%ARCH% -e VERSION="%APPVEYOR_BUILD_VERSION%" -o gtest=%GTEST%
+  - cmake .. -G "%VISUAL_STUDIO%" -A %PLATFORM%
+
+build:
+  project: $(APPVEYOR_BUILD_FOLDER)\build\SFTPAdapter.sln
+
+after_build:
+  - conan export-pkg ../SFTPAdapterInterfaceTestUtilities/conanfile.py SFTPAdapterInterfaceTestUtilities/%APPVEYOR_BUILD_VERSION%@systelab/stable -s build_type=%CONFIGURATION% -s compiler.toolset=%COMPILER_TOOLSET% -s arch=%ARCH% -o gtest=%GTEST%
+  - conan test ../test_package/conanfile.py SFTPAdapterInterfaceTestUtilities/%APPVEYOR_BUILD_VERSION%@systelab/stable -s build_type=%CONFIGURATION% -s compiler.toolset=%COMPILER_TOOLSET% -s arch=%ARCH% -o gtest=%GTEST%
+
+artifacts:
+  - path: 'build/lib/%CONFIGURATION%/SFTPAdapterInterfaceTestUtilities.lib'
+    name: SFTPAdapterInterfaceTestUtilities.lib
+
+deploy_script:
+  - ps: >- 
+      if($env:appveyor_repo_tag -eq 'True') {
+        conan upload SFTPAdapterInterface/$env:appveyor_build_version@systelab/stable --all -r systelab-public --force
+        conan upload SFTPAdapterInterfaceTestUtilities/$env:appveyor_build_version@systelab/stable --all -r systelab-public --force
+      } else {
+        echo "Not uploading because this is not a tag build"
+      }
+  - '%CYG_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER; ./ci/build_docs.sh -o \"systelab\" -s \"cpp-sftp-adapter\" -t \"$APPVEYOR_REPO_TAG_NAME\" -c AppVeyor -n \"$APPVEYOR_BUILD_WORKER_IMAGE %PLATFORM% %CONFIGURATION%\" -j \"$APPVEYOR_JOB_ID\"'
