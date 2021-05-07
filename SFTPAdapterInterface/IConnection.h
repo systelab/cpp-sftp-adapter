@@ -6,12 +6,13 @@ namespace systelab { namespace sftp {
 	class IConnection
 	{
 	public:
-		virtual IConnection() = 0;
-		virtual ~IConnection() = 0;
+		virtual bool isConnected() const = 0;
 
-		virtual void upload(const std::string& srcFile, const std::string& dstFile) = 0;
-//		virtual void download() const = 0;  TBD
+		virtual bool upload(const std::string& srcFile, const std::string& dstFile) = 0;
+//		virtual bool download(const std::string& srcFile, const std::string& dstFile) = 0;  TBD
 		
+		virtual bool rename(const std::string& srcFile, const std::string& dstFile) = 0;
+
 		virtual void close() = 0;
 	};
 }}
