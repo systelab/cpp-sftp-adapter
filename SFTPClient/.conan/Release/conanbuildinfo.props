@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="Conan-RootDirs">
+    <Conan-libssh-Root>$(USERPROFILE)\.conan\data\libssh\0.9.5\systelab\stable\package\89b7e4caaf931a5ef9bdfce3ea1bffbb63488e56</Conan-libssh-Root>
+    <Conan-OpenSSL-Root>$(USERPROFILE)\.conan\data\OpenSSL\1.0.2n\conan\stable\package\b02659d133a8131c5433777813f6385a05a7ae8a</Conan-OpenSSL-Root>
+    <Conan-zlib-Root>$(USERPROFILE)\.conan\data\zlib\1.2.11\conan\stable\package\2bb76c9adac7b8cd7c5e3b377ac9f06934aba606</Conan-zlib-Root>
+  </PropertyGroup>
+  <PropertyGroup Label="ConanVariables">
+    <ConanCompilerFlags></ConanCompilerFlags>
+    <ConanLinkerFlags></ConanLinkerFlags>
+    <ConanPreprocessorDefinitions></ConanPreprocessorDefinitions>
+    <ConanIncludeDirectories>$(USERPROFILE)\.conan\data\libssh\0.9.5\systelab\stable\package\89b7e4caaf931a5ef9bdfce3ea1bffbb63488e56\include;$(USERPROFILE)\.conan\data\OpenSSL\1.0.2n\conan\stable\package\b02659d133a8131c5433777813f6385a05a7ae8a\include;$(USERPROFILE)\.conan\data\zlib\1.2.11\conan\stable\package\2bb76c9adac7b8cd7c5e3b377ac9f06934aba606\include;</ConanIncludeDirectories>
+    <ConanResourceDirectories></ConanResourceDirectories>
+    <ConanLibraryDirectories>$(USERPROFILE)\.conan\data\libssh\0.9.5\systelab\stable\package\89b7e4caaf931a5ef9bdfce3ea1bffbb63488e56\lib;$(USERPROFILE)\.conan\data\OpenSSL\1.0.2n\conan\stable\package\b02659d133a8131c5433777813f6385a05a7ae8a\lib;$(USERPROFILE)\.conan\data\zlib\1.2.11\conan\stable\package\2bb76c9adac7b8cd7c5e3b377ac9f06934aba606\lib;</ConanLibraryDirectories>
+    <ConanBinaryDirectories>$(USERPROFILE)\.conan\data\libssh\0.9.5\systelab\stable\package\89b7e4caaf931a5ef9bdfce3ea1bffbb63488e56\bin;</ConanBinaryDirectories>
+    <ConanLibraries>ssh.lib;ssleay32.lib;libeay32.lib;crypt32.lib;msi.lib;ws2_32.lib;zlib.lib;</ConanLibraries>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LocalDebuggerEnvironment>PATH=%PATH%;$(USERPROFILE)\.conan\data\libssh\0.9.5\systelab\stable\package\89b7e4caaf931a5ef9bdfce3ea1bffbb63488e56\bin;</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ConanIncludeDirectories)%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(ConanPreprocessorDefinitions)%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>$(ConanCompilerFlags) %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(ConanLibraryDirectories)%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(ConanLibraries)%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>$(ConanLinkerFlags) %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <Midl>
+      <AdditionalIncludeDirectories>$(ConanIncludeDirectories)%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </Midl>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(ConanIncludeDirectories)%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(ConanPreprocessorDefinitions)%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>$(ConanCompilerFlags) %(AdditionalOptions)</AdditionalOptions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>
