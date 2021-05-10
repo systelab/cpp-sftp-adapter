@@ -7,8 +7,7 @@
 
 #include "SFTPConnection.h"
 
-namespace systelab {
-	namespace sftp {
+namespace systelab { namespace sftp {
 
 
 		SFTPConnection::SFTPConnection()
@@ -23,18 +22,18 @@ namespace systelab {
 		}
 
 		void SFTPConnection::connect(const std::string& ip,
-			unsigned int port,
-			const std::string& username,
-			const std::string& pubKeyFile,
-			const std::string& privKeyFile,
-			const std::string& (*getPrivKeyPassPhrase)(),
-			const std::vector<std::string>& serverFingerPrints)
+									 unsigned int port,
+									 const std::string& username,
+									 const std::string& pubKeyFile,
+									 const std::string& privKeyFile,
+									 std::function<std::string()> getPrivKeyPassPhraseFn,
+									 const std::vector<std::string>& serverFingerPrints)
 		{
 			if (sshConnect(ip, port))
 			{
 				if (verifySFTPServerIdentity(serverFingerPrints))
 				{
-					if (sshAuthorize(username, pubKeyFile, privKeyFile, (*getPrivKeyPassPhrase)()))
+					if (sshAuthorize(username, pubKeyFile, privKeyFile, getPrivKeyPassPhraseFn()))
 					{
 						if (sftpConnect())
 						{
@@ -216,5 +215,4 @@ namespace systelab {
 			}
 		}
 
-	}
-}
+}}
