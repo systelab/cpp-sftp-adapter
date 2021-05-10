@@ -121,10 +121,6 @@ pipeline
 
         stage('Deploy')
 		{
-			when
-			{
-				expression { params.createVersion == true }
-			}
 			steps
 			{
 				sh script: "conan upload SFTPAdapter/${version}@systelab/${channel} --all -r snow-conan-production-local --force", label: "Deploy conan packet for SFTPAdapter"
