@@ -1,8 +1,16 @@
+def channel = "testing"
+def version = "0.0.0"
+
 pipeline
 {
     agent
     {
         label 'lib-build'
+    }
+
+    triggers
+    {
+        pollSCM 'H/5 * * * *'
     }
 
     options
@@ -56,15 +64,11 @@ pipeline
             {
                 script
 				{
-					if (params.createVersion)
-					{
-						sh script: "build/scripts/setVersionNumber.sh -v ${params.version}", label: "Set version number if applicable"
-					}
 					props.projectConfigurations.split(',').each
 					{ config ->
 						props.buildProjects.split(',').each
 						{ project ->
-								sh script: "build/scripts/build.sh -p '${project}' -c '${config}' -r '$WORKSPACE' -s '${props.solutionPath}' -d '$VS150COMNTOOLS\\..\\IDE\\devenv.com' -v " + ((params.version == "") ? "0.0.0" : "${params.version}") + " -n " + ((params.stable) ? "stable" : "testing"), label: "Build project '${project}' for '${config}'"
+								sh script: "build/scripts/build.sh -p '${project}' -c '${config}' -r '$WORKSPACE' -s '${props.solutionPath}' -d '$VS150COMNTOOLS\\..\\IDE\\devenv.com' -v " + "${version}" + " -n " + "${channel}", label: "Build project '${project}' for '${config}'"
 						}
 					}
 				}           
@@ -89,7 +93,7 @@ pipeline
 						scannerHome = tool 'SonarQubeScanner'
 						withSonarQubeEnv('SonarQube')
 						{
-							bat script: "${scannerHome}bin\\sonar-scanner.bat -Dproject.settings=build/sonarqube/sonar-project.properties -Dsonar.branch.name=${env.BRANCH_NAME} -Dsonar.projectVersion=${params.version}/${channel}", label: "SonarQube analysis"
+							bat script: "${scannerHome}bin\\sonar-scanner.bat -Dproject.settings=sonar-project.properties -Dsonar.branch.name=${env.BRANCH_NAME} -Dsonar.projectVersion=${version}/${channel}", label: "SonarQube analysis"
 						}
 						timeout(time: 15, unit: 'MINUTES')
 						{
@@ -110,10 +114,6 @@ pipeline
         {
             // cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: "${props.codeCoverageReportFiles}", failNoReports: false, failUnhealthy: false, failUnstable: false, lineCoverageTargets: '30, 0, 0', maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
             publishCppcheck pattern: "report/*_cppcheck.xml", newThreshold: "5", threshold: "5", newFailureThreshold: "3", failureThreshold: "7", severityError: true, severityWarning: true
-            script
-            {
-                currentBuild.description = "${params.version}"
-            }
         }
     }
     
