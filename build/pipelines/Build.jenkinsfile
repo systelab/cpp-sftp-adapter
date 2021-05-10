@@ -122,16 +122,17 @@ pipeline
 		
 		stage('Deploy')
 		{
+			when
+			{
+				expression { return params.uploadTestingPkg }
+			}
 			steps
 			{
 				script
 				{
-					if (params.uploadTestingPkg)
-					{
-						props.conanUploadPackages.split(',').each
-						{ uploadPkg ->
-							sh script: "conan upload ${uploadPkg}/${version}@systelab/${channel} --all -r snow-conan-production-local --force", label: "Deploy conan packet for ${uploadPkg}"
-						}
+					props.conanUploadPackages.split(',').each
+					{ uploadPkg ->
+						sh script: "conan upload ${uploadPkg}/${version}@systelab/${channel} --all -r snow-conan-production-local --force", label: "Deploy conan packet for ${uploadPkg}"
 					}
 				}
 			}
