@@ -1,11 +1,12 @@
 #pragma once
 
-#include "ISFTPClientAdapter.h"
-#include "IConnection.h"
+#include "DLLImpExp.h"
+#include "SFTPAdapterInterface/ISFTPClientAdapter.h"
+#include "SFTPAdapterInterface/IConnection.h"
 
 namespace systelab { namespace sftp {
 
-	class SFTPClient : public ISFTPClientAdapter
+	class SFTPLIBSSHADAPTER_API SFTPClient : public ISFTPClientAdapter
 	{
 	public:
 		SFTPClient() = default;
@@ -16,7 +17,7 @@ namespace systelab { namespace sftp {
 											 const std::string& username,
 											 const std::string& pubKeyFile,
 											 const std::string& privKeyFile,
-											 const std::string& privKeyPassPhrase,
+											 const std::string& (*getPrivKeyPassPhrase)(),
 											 const std::vector<std::string>& serverFingerPrints) override;
 	};
 

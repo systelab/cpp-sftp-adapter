@@ -1,7 +1,7 @@
 from conans import ConanFile
 
-class SFTPClientConan(ConanFile):
-	name = "SFTPClient"
+class SFTPClientCLIConan(ConanFile):
+	name = "SFTPClientCLI"
 	description = "CLI component that uses SFTP library"
 	author = "CSW <csw@werfen.com>"
 	topics = ("conan", "sftp")

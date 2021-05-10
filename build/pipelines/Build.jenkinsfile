@@ -1,0 +1,120 @@
+pipeline
+{
+    agent
+    {
+        label 'lib-build'
+    }
+
+    options
+    {
+        skipDefaultCheckout(true)
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    stages
+    {
+        stage('Checkout')
+		{
+			steps
+			{
+				deleteDir()
+				checkout(
+                    changelog: true,
+                    poll: true,
+                    scm: [
+                        $class: 'GitSCM',
+                        branches: scm.branches,
+                        extensions: scm.extensions + 
+                            [[
+                                $class: 'CloneOption',
+                                shallow: true,
+                                noTags: true,
+                                reference: '',
+                                timeout: 10
+                            ]],
+                        userRemoteConfigs: scm.userRemoteConfigs
+                    ]
+                )
+			}
+		}
+        stage('Read properties')
+        {
+            steps
+            {
+                script
+                {
+                    println 'Reading pipeline properties'
+                    props = readProperties file:'build/pipelines/pipeline.properties'
+                    props.each { propKey, propValue -> println "${propKey}: ${propValue}" }
+                }
+            }
+        }
+        stage('Build')
+        {
+            steps
+            {
+                script
+				{
+					if (params.createVersion)
+					{
+						sh script: "build/scripts/setVersionNumber.sh -v ${params.version}", label: "Set version number if applicable"
+					}
+					props.projectConfigurations.split(',').each
+					{ config ->
+						props.buildProjects.split(',').each
+						{ project ->
+								sh script: "build/scripts/build.sh -p '${project}' -c '${config}' -r '$WORKSPACE' -s '${props.solutionPath}' -d '$VS150COMNTOOLS\\..\\IDE\\devenv.com' -v " + ((params.version == "") ? "0.0.0" : "${params.version}") + " -n " + ((params.stable) ? "stable" : "testing"), label: "Build project '${project}' for '${config}'"
+						}
+					}
+				}           
+            }
+        }
+        stage('Static Code Analysis')
+		{
+			steps
+			{
+				sh "build/scripts/cppcheck_execute.sh -r '$WORKSPACE' -p '${props.cppCheckProjectPaths}' -k '${props.cppCheckProjectNames}'"
+			}			
+		}
+
+        stage('SonarQube Upload')
+		{
+			steps
+			{
+				script
+				{
+					try
+					{
+						scannerHome = tool 'SonarQubeScanner'
+						withSonarQubeEnv('SonarQube')
+						{
+							bat script: "${scannerHome}bin\\sonar-scanner.bat -Dproject.settings=build/sonarqube/sonar-project.properties -Dsonar.branch.name=${env.BRANCH_NAME} -Dsonar.projectVersion=${params.version}/${channel}", label: "SonarQube analysis"
+						}
+						timeout(time: 15, unit: 'MINUTES')
+						{
+							waitForQualityGate abortPipeline: false
+						}
+					}
+					catch (Exception err)
+					{
+						currentBuild.result = 'UNSTABLE'
+					}
+				}
+			}
+		}
+    }
+    post
+    {
+        always
+        {
+            // cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: "${props.codeCoverageReportFiles}", failNoReports: false, failUnhealthy: false, failUnstable: false, lineCoverageTargets: '30, 0, 0', maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+            publishCppcheck pattern: "report/*_cppcheck.xml", newThreshold: "5", threshold: "5", newFailureThreshold: "3", failureThreshold: "7", severityError: true, severityWarning: true
+            script
+            {
+                currentBuild.description = "${params.version}"
+            }
+        }
+    }
+    
+}

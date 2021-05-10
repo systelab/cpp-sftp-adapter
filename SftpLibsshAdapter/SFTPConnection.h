@@ -1,13 +1,14 @@
 #pragma once
 
-#include "IConnection.h"
+#include "DLLImpExp.h"
+#include "SFTPAdapterInterface/IConnection.h"
 
 #include <libssh/libssh.h>
 #include <libssh/sftp.h>
 
 namespace systelab { namespace sftp {
-
-	class SFTPConnection : public IConnection
+	
+	class SFTPLIBSSHADAPTER_API SFTPConnection : public IConnection
 	{
 	public:
 		SFTPConnection();
@@ -18,7 +19,7 @@ namespace systelab { namespace sftp {
 					 const std::string& username,
 					 const std::string& pubKeyFile,
 					 const std::string& privKeyFile,
-					 const std::string& privKeyPassPhrase,
+					 const std::string& (*getPrivKeyPassPhrase)(),
 					 const std::vector<std::string>& serverFingerPrints);
 
 		bool isConnected() const override;
