@@ -42,7 +42,7 @@ pipeline
                             [[
                                 $class: 'CloneOption',
                                 shallow: true,
-                                noTags: true,
+                                noTags: false,
                                 reference: '',
                                 timeout: 10
                             ]],
