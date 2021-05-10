@@ -20,25 +20,22 @@ pipeline
 			{
 				deleteDir()
 				checkout(
-					changelog: true,
-					poll: true,
-					scm: [$class: 'GitSCM', branches: [[name: env.BRANCH_NAME]],
-						doGenerateSubmoduleConfigurations: false,
-						extensions: [[
-							$class: 'SubmoduleOption',
-							disableSubmodules: false,
-							parentCredentials: true,
-							recursiveSubmodules: true,
-							reference: '',
-							trackingSubmodules: false
-						]],
-						submoduleCfg: [],
-						userRemoteConfigs: [[
-							credentialsId: 'Github user',
-							url: 'https://github.com/systelab/cpp-sftp-adapter.git'
-						]]
-					]
-				)
+                    changelog: true,
+                    poll: true,
+                    scm: [
+                        $class: 'GitSCM',
+                        branches: scm.branches,
+                        extensions: scm.extensions + 
+                            [[
+                                $class: 'CloneOption',
+                                shallow: true,
+                                noTags: true,
+                                reference: '',
+                                timeout: 10
+                            ]],
+                        userRemoteConfigs: scm.userRemoteConfigs
+                    ]
+                )
 			}
 		}
         stage('Read properties')
