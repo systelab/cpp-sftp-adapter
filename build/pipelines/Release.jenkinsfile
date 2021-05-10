@@ -64,7 +64,7 @@ pipeline
 					{
 						channel = "stable"
 					}
-                    version = ${params.version}
+                    version = params.version
                     println 'Package version set to ${version}/${channel}'
                 }
             }
