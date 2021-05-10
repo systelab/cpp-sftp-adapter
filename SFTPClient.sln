@@ -11,34 +11,20 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SftpLibsshAdapterTest", "Sf
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}.Debug|x64.ActiveCfg = Debug|x64
-		{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}.Debug|x64.Build.0 = Debug|x64
 		{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}.Debug|x86.ActiveCfg = Debug|Win32
 		{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}.Debug|x86.Build.0 = Debug|Win32
-		{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}.Release|x64.ActiveCfg = Release|x64
-		{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}.Release|x64.Build.0 = Release|x64
 		{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}.Release|x86.ActiveCfg = Release|Win32
 		{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}.Release|x86.Build.0 = Release|Win32
-		{2E74EC0E-EBE1-4E30-A598-AEDB61B8FA6B}.Debug|x64.ActiveCfg = Debug|x64
-		{2E74EC0E-EBE1-4E30-A598-AEDB61B8FA6B}.Debug|x64.Build.0 = Debug|x64
 		{2E74EC0E-EBE1-4E30-A598-AEDB61B8FA6B}.Debug|x86.ActiveCfg = Debug|Win32
 		{2E74EC0E-EBE1-4E30-A598-AEDB61B8FA6B}.Debug|x86.Build.0 = Debug|Win32
-		{2E74EC0E-EBE1-4E30-A598-AEDB61B8FA6B}.Release|x64.ActiveCfg = Release|x64
-		{2E74EC0E-EBE1-4E30-A598-AEDB61B8FA6B}.Release|x64.Build.0 = Release|x64
 		{2E74EC0E-EBE1-4E30-A598-AEDB61B8FA6B}.Release|x86.ActiveCfg = Release|Win32
 		{2E74EC0E-EBE1-4E30-A598-AEDB61B8FA6B}.Release|x86.Build.0 = Release|Win32
-		{1D39D9A5-6E39-4CED-8D8D-C706E0FA8E6B}.Debug|x64.ActiveCfg = Debug|x64
-		{1D39D9A5-6E39-4CED-8D8D-C706E0FA8E6B}.Debug|x64.Build.0 = Debug|x64
 		{1D39D9A5-6E39-4CED-8D8D-C706E0FA8E6B}.Debug|x86.ActiveCfg = Debug|Win32
 		{1D39D9A5-6E39-4CED-8D8D-C706E0FA8E6B}.Debug|x86.Build.0 = Debug|Win32
-		{1D39D9A5-6E39-4CED-8D8D-C706E0FA8E6B}.Release|x64.ActiveCfg = Release|x64
-		{1D39D9A5-6E39-4CED-8D8D-C706E0FA8E6B}.Release|x64.Build.0 = Release|x64
 		{1D39D9A5-6E39-4CED-8D8D-C706E0FA8E6B}.Release|x86.ActiveCfg = Release|Win32
 		{1D39D9A5-6E39-4CED-8D8D-C706E0FA8E6B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
