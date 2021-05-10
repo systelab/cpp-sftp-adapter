@@ -77,18 +77,18 @@ pipeline
 				sh "build/scripts/cppcheck_execute.sh -r '$WORKSPACE' -p '${props.cppCheckProjectPaths}' -k '${props.cppCheckProjectNames}'"
 			}			
 		}
-
-        post
+    }
+    post
+    {
+        always
         {
-            always
+            // cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: "${props.codeCoverageReportFiles}", failNoReports: false, failUnhealthy: false, failUnstable: false, lineCoverageTargets: '30, 0, 0', maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+            publishCppcheck pattern: "report/*_cppcheck.xml", newThreshold: "5", threshold: "5", newFailureThreshold: "3", failureThreshold: "7", severityError: true, severityWarning: true
+            script
             {
-                // cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: "${props.codeCoverageReportFiles}", failNoReports: false, failUnhealthy: false, failUnstable: false, lineCoverageTargets: '30, 0, 0', maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
-                publishCppcheck pattern: "report/*_cppcheck.xml", newThreshold: "5", threshold: "5", newFailureThreshold: "3", failureThreshold: "7", severityError: true, severityWarning: true
-                script
-                {
-                    currentBuild.description = "${params.version}"
-                }
+                currentBuild.description = "${params.version}"
             }
         }
     }
+    
 }
