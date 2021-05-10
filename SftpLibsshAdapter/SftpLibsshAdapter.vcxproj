@@ -61,10 +61,12 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project=".conan\Debug\conanbuildinfo.props" />
+    <Import Project="$(SolutionDir)conan-package.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project=".conan\Release\conanbuildinfo.props" />
+    <Import Project="$(SolutionDir)conan-package.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -109,6 +111,9 @@
     <PreBuildEvent>
       <Command>conan install $(ProjectDir)conanfile.py -if $(ProjectDir).conan\$(Configuration) -s build_type=$(Configuration) --profile=$(SolutionDir)windows_x86_vs15.conanprofile</Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>conan export-pkg $(ProjectDir)conanfile.py SFTPLibSSHAdapter/$(ConanPackageVersion)@systelab/$(ConanPackageChannel) -s build_type=$(Configuration) -e CONAN_LIB_DIR=$(OutDir) --profile=$(SolutionDir)windows_x86_vs15.conanprofile --force</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -152,6 +157,9 @@
     <Lib>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
+    <PostBuildEvent>
+      <Command>conan export-pkg $(ProjectDir)conanfile.py SFTPLibSSHAdapter/$(ConanPackageVersion)@systelab/$(ConanPackageChannel) -s build_type=$(Configuration) -e CONAN_LIB_DIR=$(OutDir) --profile=$(SolutionDir)windows_x86_vs15.conanprofile --force</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
