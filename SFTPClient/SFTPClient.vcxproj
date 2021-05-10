@@ -23,7 +23,7 @@
     <ProjectGuid>{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SFTPClient</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
