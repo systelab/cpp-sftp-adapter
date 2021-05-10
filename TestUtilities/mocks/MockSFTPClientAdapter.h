@@ -12,7 +12,7 @@ namespace systelab { namespace sftp {namespace test_utility {
 
 			MOCK_CONST_METHOD0(Connect, std::unique_ptr<IConnection>(
 				const std::string&, unsigned int, const std::string&, const std::string&,
-				const std::string&, const std::string&, const std::vector<std::string>&));
+				const std::string&, const std::string& (*f)(), const std::vector<std::string>&));
 	};
 
 }}}

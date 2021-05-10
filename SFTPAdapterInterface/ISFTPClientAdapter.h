@@ -17,7 +17,7 @@ namespace systelab { namespace sftp {
 													 const std::string& username,
 													 const std::string& pubKeyFile,
 													 const std::string& privKeyFile,
-													 const std::string& privKeyPassPhrase,
+													 const std::string& (*getPrivKeyPassPhrase)(),
 													 const std::vector<std::string>& serverFingerPrints) = 0;
 	 
 		struct Exception : std::runtime_error
