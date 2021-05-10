@@ -17,7 +17,7 @@ pipeline
         {
             steps
             {
-                sh script: "build/scripts/build.sh -p 'STPClient -c 'Release' -r '$WORKSPACE' -s 'src/SFTPClient.sln' -d '$VS150COMNTOOLS\\..\\IDE\\devenv.com' -v 0.0.0 -n testing, label: "Build project SFTPClient' for 'Release'"
+                sh script: "build/scripts/build.sh -p 'STPClient -c 'Release' -r '$WORKSPACE' -s 'src/SFTPClient.sln' -d '$VS150COMNTOOLS\\..\\IDE\\devenv.com' -v 0.0.0 -n testing, label: Build project SFTPClient for Release"
             }
         }
     }
