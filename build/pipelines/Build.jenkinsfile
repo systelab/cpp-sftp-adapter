@@ -13,14 +13,33 @@ pipeline
 
     stages
     {
+        stage('Read properties')
+        {
+            script
+            {
+                println 'Reading pipeline properties'
+                props = readProperties file:'build/pipelines/pipeline.properties'
+                props.each { propKey, propValue -> println "${propKey}: ${propValue}" }
+            }
+        }
         stage('Build')
         {
             steps
             {
                 script
-                {
-                    sh script: "build/scripts/build.sh -p 'STPClient -c 'Release' -r '$WORKSPACE' -s 'src/SFTPClient.sln' -d '$VS150COMNTOOLS\\..\\IDE\\devenv.com' -v 0.0.0 -n testing, label: Build project SFTPClient for Release"
-                }                
+				{
+					if (params.createVersion)
+					{
+						sh script: "build/scripts/setVersionNumber.sh -v ${params.version}", label: "Set version number if applicable"
+					}
+					props.projectConfigurations.split(',').each
+					{ config ->
+						props.buildProjects.split(',').each
+						{ project ->
+								sh script: "build/scripts/build.sh -p '${project}' -c '${config}' -r '$WORKSPACE' -s '${props.solutionPath}' -d '$VS150COMNTOOLS\\..\\IDE\\devenv.com' -v " + ((params.version == "") ? "0.0.0" : "${params.version}") + " -n " + ((params.stable) ? "stable" : "testing"), label: "Build project '${project}' for '${config}'"
+						}
+					}
+				}           
             }
         }
     }
