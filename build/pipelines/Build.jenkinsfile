@@ -12,6 +12,13 @@ pipeline
     {
         pollSCM 'H/5 * * * *'
     }
+	
+	parameters
+	{
+		booleanParam( name: 'uploadTestingPkg',
+					  description: 'Whether or not to upload testing conan package (Mind to remove it from repository first)',
+					  defaultValue: false )
+	}
 
     options
     {
@@ -115,6 +122,10 @@ pipeline
 		
 		stage('Deploy')
 		{
+			when
+			{
+				expression { return params.uploadTestingPkg }
+			}
 			steps
 			{
 				script
