@@ -77,6 +77,32 @@ pipeline
 				sh "build/scripts/cppcheck_execute.sh -r '$WORKSPACE' -p '${props.cppCheckProjectPaths}' -k '${props.cppCheckProjectNames}'"
 			}			
 		}
+
+        stage('SonarQube Upload')
+		{
+			steps
+			{
+				script
+				{
+					try
+					{
+						scannerHome = tool 'SonarQubeScanner'
+						withSonarQubeEnv('SonarQube')
+						{
+							bat script: "${scannerHome}bin\\sonar-scanner.bat -Dproject.settings=build/sonarqube/sonar-project.properties -Dsonar.branch.name=${env.BRANCH_NAME} -Dsonar.projectVersion=${params.version}/${channel}", label: "SonarQube analysis"
+						}
+						timeout(time: 15, unit: 'MINUTES')
+						{
+							waitForQualityGate abortPipeline: false
+						}
+					}
+					catch (Exception err)
+					{
+						currentBuild.result = 'UNSTABLE'
+					}
+				}
+			}
+		}
     }
     post
     {
