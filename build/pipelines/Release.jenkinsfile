@@ -1,0 +1,143 @@
+def channel = "testing"
+def version = "0.0.0"
+
+pipeline
+{
+    agent
+    {
+        label 'lib-build'
+    }
+
+	parameters
+	{
+		string(	name: 'version',
+				description: 'Number of the version to build (must match the name of the tag that will be checked out)',
+				defaultValue: '' )
+
+		booleanParam( name: 'stable',
+					  description: 'Show if generated library should be uploaded as stable or testing',
+					  defaultValue: false )
+	}
+
+    options
+    {
+        skipDefaultCheckout(true)
+        disableConcurrentBuilds()
+    }
+
+    stages
+    {
+        stage('Checkout')
+		{
+			steps
+			{
+				deleteDir()
+				checkout(
+                    changelog: true,
+                    poll: true,
+                    scm: [
+                        $class: 'GitSCM',
+                        branches: 'tags/${param.version}',
+                        extensions: scm.extensions + 
+                            [[
+                                $class: 'CloneOption',
+                                shallow: true,
+                                noTags: true,
+                                reference: '',
+                                timeout: 10
+                            ]],
+                        userRemoteConfigs: scm.userRemoteConfigs
+                    ]
+                )
+			}
+		}
+        stage('Read properties')
+        {
+            steps
+            {
+                script
+                {
+                    println 'Reading pipeline properties'
+                    props = readProperties file:'build/pipelines/pipeline.properties'
+                    props.each { propKey, propValue -> println "${propKey}: ${propValue}" }
+                    if (params.stable)
+					{
+						channel = "stable"
+					}
+                    version = ${params.version}
+                    println 'Package version set to ${version}/${channel}'
+                }
+            }
+        }
+        stage('Build')
+        {
+            steps
+            {
+                script
+				{
+					props.projectConfigurations.split(',').each
+					{ config ->
+						props.buildProjects.split(',').each
+						{ project ->
+								sh script: "build/scripts/build.sh -p '${project}' -c '${config}' -r '$WORKSPACE' -s '${props.solutionPath}' -d '$VS150COMNTOOLS\\..\\IDE\\devenv.com' -v " + "${version}" + " -n " + "${channel}", label: "Build project '${project}' for '${config}'"
+						}
+					}
+				}           
+            }
+        }
+        stage('Static Code Analysis')
+		{
+			steps
+			{
+				sh "build/scripts/cppcheck_execute.sh -r '$WORKSPACE' -p '${props.cppCheckProjectPaths}' -k '${props.cppCheckProjectNames}'"
+			}			
+		}
+
+        stage('SonarQube Upload')
+		{
+			steps
+			{
+				script
+				{
+					try
+					{
+						scannerHome = tool 'SonarQubeScanner'
+						withSonarQubeEnv('SonarQube')
+						{
+							bat script: "${scannerHome}bin\\sonar-scanner.bat -Dproject.settings=sonar-project.properties -Dsonar.branch.name=${env.BRANCH_NAME} -Dsonar.projectVersion=${version}/${channel}", label: "SonarQube analysis"
+						}
+						timeout(time: 15, unit: 'MINUTES')
+						{
+							waitForQualityGate abortPipeline: false
+						}
+					}
+					catch (Exception err)
+					{
+						currentBuild.result = 'UNSTABLE'
+					}
+				}
+			}
+		}
+
+        stage('Deploy')
+		{
+			when
+			{
+				expression { params.createVersion == true }
+			}
+			steps
+			{
+				sh script: "conan upload SFTPAdapter/${version}@systelab/${channel} --all -r snow-conan-production-local --force", label: "Deploy conan packet for SFTPAdapter"
+			}
+		}
+    }
+    post
+    {
+        always
+        {
+            // cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: "${props.codeCoverageReportFiles}", failNoReports: false, failUnhealthy: false, failUnstable: false, lineCoverageTargets: '30, 0, 0', maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+            publishCppcheck pattern: "report/*_cppcheck.xml", newThreshold: "5", threshold: "5", newFailureThreshold: "3", failureThreshold: "7", severityError: true, severityWarning: true
+        }
+    }
+    
+}
