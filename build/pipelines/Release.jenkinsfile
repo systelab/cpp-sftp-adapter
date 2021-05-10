@@ -37,7 +37,7 @@ pipeline
                     poll: true,
                     scm: [
                         $class: 'GitSCM',
-                        branches: 'tags/${param.version}',
+                        branches: [[name: env.BRANCH_NAME]],
                         extensions: scm.extensions + 
                             [[
                                 $class: 'CloneOption',
