@@ -64,6 +64,8 @@ pipeline
             {
                 script
 				{
+					sh script: "conan export-pkg SFTPAdapterInterface/conanfile.py SFTPAdapterInterface/${version}@systelab/${channel} --force", label: "Build conan package for SFTPAdapterInterface"
+					
 					props.projectConfigurations.split(',').each
 					{ config ->
 						props.buildProjects.split(',').each
@@ -105,6 +107,15 @@ pipeline
 						currentBuild.result = 'UNSTABLE'
 					}
 				}
+			}
+		}
+		
+		stage('Deploy')
+		{
+			steps
+			{
+				sh script: "conan upload SFTPAdapterInterface/${version}@systelab/${channel} --all -r snow-conan-production-local --force", label: "Deploy conan packet for SFTPAdapterInterface"
+				sh script: "conan upload SFTPLibSSHAdapter/${version}@systelab/${channel} --all -r snow-conan-production-local --force", label: "Deploy conan packet for SFTPLibSSHAdapter"
 			}
 		}
     }
