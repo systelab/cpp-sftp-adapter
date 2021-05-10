@@ -7,12 +7,40 @@ pipeline
 
     options
     {
+        skipDefaultCheckout(true)
         disableConcurrentBuilds()
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
 
     stages
     {
+        stage('Checkout')
+		{
+			steps
+			{
+				deleteDir()
+				checkout(
+					changelog: true,
+					poll: true,
+					scm: [$class: 'GitSCM', branches: [[name: env.BRANCH_NAME]],
+						doGenerateSubmoduleConfigurations: false,
+						extensions: [[
+							$class: 'SubmoduleOption',
+							disableSubmodules: false,
+							parentCredentials: true,
+							recursiveSubmodules: true,
+							reference: '',
+							trackingSubmodules: false
+						]],
+						submoduleCfg: [],
+						userRemoteConfigs: [[
+							credentialsId: 'Github user',
+							url: 'https://github.com/systelab/cpp-sftp-adapter.git'
+						]]
+					]
+				)
+			}
+		}
         stage('Read properties')
         {
             steps
