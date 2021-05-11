@@ -2,3 +2,5 @@
 Debug/
 packages/
 Release/
+*.vcxproj.user
+
