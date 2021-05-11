@@ -12,7 +12,7 @@ namespace systelab { namespace sftp {
 	class ISFTPClientAdapter
 	{
 	public:
-		virtual std::unique_ptr<IConnection> Connect(const std::string& ip,
+		virtual std::unique_ptr<IConnection> connect(const std::string& ip,
 													 unsigned int port,
 													 const std::string& username,
 													 const std::string& pubKeyFile,

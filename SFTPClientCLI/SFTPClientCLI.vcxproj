@@ -74,7 +74,7 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>conan install $(ProjectDir)conanfile.py -if $(ProjectDir).conan\$(Configuration) -s build_type=$(Configuration) --profile=$(SolutionDir)windows_x86_vs15.conanprofile</Command>
+      <Command>conan install $(ProjectDir)conanfile.py -if $(ProjectDir).conan\$(Configuration) -s build_type=$(Configuration) -e CONAN_BIN_DIR=$(OutDir) --profile=$(SolutionDir)windows_x86_vs15.conanprofile</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -98,7 +98,7 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>conan install $(ProjectDir)conanfile.py -if $(ProjectDir).conan\$(Configuration) -s build_type=$(Configuration) --profile=$(SolutionDir)windows_x86_vs15.conanprofile</Command>
+      <Command>conan install $(ProjectDir)conanfile.py -if $(ProjectDir).conan\$(Configuration) -s build_type=$(Configuration) -e CONAN_BIN_DIR=$(OutDir) --profile=$(SolutionDir)windows_x86_vs15.conanprofile</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

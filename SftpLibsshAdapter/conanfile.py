@@ -16,8 +16,8 @@ class SFTPLibSSHAdapterConan(ConanFile):
 	def package(self):
 		self.copy("*.h", dst="include/SFTPLibSSHAdapter", src=".")
 		self.copy("SFTPLibSSHAdapter.lib", dst="lib", src=os.environ["CONAN_LIB_DIR"])
-		self.copy("SFTPLibSSHAdapter.dll", dst="bin", src=os.environ["CONAN_LIB_DIR"])
-		self.copy("SFTPLibSSHAdapter.pdb", dst="bin", src=os.environ["CONAN_LIB_DIR"])
+		self.copy("SFTPLibSSHAdapter.dll", dst="bin", src=os.environ["CONAN_BIN_DIR"])
+		self.copy("SFTPLibSSHAdapter.pdb", dst="bin", src=os.environ["CONAN_BIN_DIR"])
 		
 	def package_info(self):
 		self.cpp_info.libs = tools.collect_libs(self)
