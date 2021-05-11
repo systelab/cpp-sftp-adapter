@@ -11,7 +11,7 @@ namespace systelab { namespace sftp {
 	class SFTPLIBSSHADAPTER_API SFTPConnection : public IConnection
 	{
 	public:
-		SFTPConnection();
+		SFTPConnection() = default;
 		~SFTPConnection();
 
 		void connect(const std::string& ip,
@@ -19,7 +19,7 @@ namespace systelab { namespace sftp {
 					 const std::string& username,
 					 const std::string& pubKeyFile,
 					 const std::string& privKeyFile,
-					 std::function<std::string()> getPrivKeyPassPhraseFn,
+					 const std::function<std::string()>& getPrivKeyPassPhraseFn,
 					 const std::vector<std::string>& serverFingerPrints);
 
 		bool isConnected() const override;

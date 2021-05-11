@@ -17,7 +17,7 @@ namespace systelab { namespace sftp {
 											 const std::string& username,
 											 const std::string& pubKeyFile,
 											 const std::string& privKeyFile,
-											 std::function<std::string()> getPrivKeyPassPhraseFn,
+											 const std::function<std::string()>& getPrivKeyPassPhraseFn,
 											 const std::vector<std::string>& serverFingerPrints) override;
 	};
 
