@@ -12,6 +12,13 @@ pipeline
     {
         pollSCM 'H/5 * * * *'
     }
+	
+	parameters
+	{
+		booleanParam( name: 'uploadTestingPkg',
+					  description: 'Whether or not to upload testing conan package (Mind to remove it from repository first)',
+					  defaultValue: false )
+	}
 
     options
     {
@@ -64,6 +71,11 @@ pipeline
             {
                 script
 				{
+					props.conanHeaderPackages.split(',').each
+					{ headerPkg ->
+						sh script: "conan export-pkg ${headerPkg}/conanfile.py ${headerPkg}/${version}@systelab/${channel} --build-folder ${headerPkg} --force", label: "Build conan package for ${headerPkg}"
+					}
+					
 					props.projectConfigurations.split(',').each
 					{ config ->
 						props.buildProjects.split(',').each
@@ -103,6 +115,24 @@ pipeline
 					catch (Exception err)
 					{
 						currentBuild.result = 'UNSTABLE'
+					}
+				}
+			}
+		}
+		
+		stage('Deploy')
+		{
+			when
+			{
+				expression { return params.uploadTestingPkg }
+			}
+			steps
+			{
+				script
+				{
+					props.conanUploadPackages.split(',').each
+					{ uploadPkg ->
+						sh script: "conan upload ${uploadPkg}/${version}@systelab/${channel} --all -r snow-conan-production-local --force", label: "Deploy conan packet for ${uploadPkg}"
 					}
 				}
 			}

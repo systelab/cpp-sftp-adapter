@@ -1,7 +1,7 @@
 #pragma once
 
 #include "DLLImpExp.h"
-#include "IConnection.h"
+#include "SFTPAdapterInterface/IConnection.h"
 
 #include <libssh/libssh.h>
 #include <libssh/sftp.h>
