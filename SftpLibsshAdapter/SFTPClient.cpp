@@ -5,7 +5,7 @@
 namespace systelab { namespace sftp {
 
 		std::unique_ptr<IConnection>
-			SFTPClient::Connect(const std::string& ip,
+			SFTPClient::connect(const std::string& ip,
 								unsigned int port,
 								const std::string& username,
 								const std::string& pubKeyFile,

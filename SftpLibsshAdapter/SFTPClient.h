@@ -12,7 +12,7 @@ namespace systelab { namespace sftp {
 		SFTPClient() = default;
 		~SFTPClient() = default;
 
-		std::unique_ptr<IConnection> Connect(const std::string& ip,
+		std::unique_ptr<IConnection> connect(const std::string& ip,
 											 unsigned int port,
 											 const std::string& username,
 											 const std::string& pubKeyFile,
