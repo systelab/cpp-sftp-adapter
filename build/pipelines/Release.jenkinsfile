@@ -142,6 +142,10 @@ pipeline
         always
         {
             publishCppcheck pattern: "report/*_cppcheck.xml", newThreshold: "5", threshold: "5", newFailureThreshold: "3", failureThreshold: "7", severityError: true, severityWarning: true
+            script
+			{
+				currentBuild.description = "${version}"
+			}
         }
     }
     
