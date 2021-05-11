@@ -1,3 +1,4 @@
+import os
 from conans import ConanFile
 
 class SFTPClientCLIConan(ConanFile):
@@ -11,3 +12,6 @@ class SFTPClientCLIConan(ConanFile):
 
 	def requirements(self):
 		self.requires("libssh/0.9.5@systelab/stable")
+		
+	def imports(self):
+		self.copy("*.dll", dst=os.environ["CONAN_BIN_DIR"], src="bin")

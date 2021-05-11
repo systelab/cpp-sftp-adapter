@@ -50,12 +50,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)lib\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)int\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)lib\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)int\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -73,12 +73,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(SolutionDir)lib\$(Configuration)\$(TargetName).lib</ImportLibrary>
     </Link>
     <PreBuildEvent>
       <Command>conan install $(ProjectDir)conanfile.py -if $(ProjectDir).conan\$(Configuration) -s build_type=$(Configuration) --profile=$(SolutionDir)windows_x86_vs15.conanprofile</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>conan export-pkg $(ProjectDir)conanfile.py SFTPLibSSHAdapter/$(ConanPackageVersion)@systelab/$(ConanPackageChannel) -s build_type=$(Configuration) -e CONAN_LIB_DIR=$(OutDir) --profile=$(SolutionDir)windows_x86_vs15.conanprofile --force</Command>
+      <Command>conan export-pkg $(ProjectDir)conanfile.py SFTPLibSSHAdapter/$(ConanPackageVersion)@systelab/$(ConanPackageChannel) -s build_type=$(Configuration) -e CONAN_BIN_DIR=$(OutDir) -e CONAN_LIB_DIR=$(SolutionDir)lib\$(Configuration) --profile=$(SolutionDir)windows_x86_vs15.conanprofile --force</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -100,6 +101,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(SolutionDir)lib\$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <ForceFileOutput>Enabled</ForceFileOutput>
     </Link>
     <PreBuildEvent>
       <Command>conan install $(ProjectDir)conanfile.py -if $(ProjectDir).conan\$(Configuration) -s build_type=$(Configuration) --profile=$(SolutionDir)windows_x86_vs15.conanprofile</Command>
@@ -108,7 +111,7 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>conan export-pkg $(ProjectDir)conanfile.py SFTPLibSSHAdapter/$(ConanPackageVersion)@systelab/$(ConanPackageChannel) -s build_type=$(Configuration) -e CONAN_LIB_DIR=$(OutDir) --profile=$(SolutionDir)windows_x86_vs15.conanprofile --force</Command>
+      <Command>conan export-pkg $(ProjectDir)conanfile.py SFTPLibSSHAdapter/$(ConanPackageVersion)@systelab/$(ConanPackageChannel) -s build_type=$(Configuration) -e CONAN_BIN_DIR=$(OutDir) -e CONAN_LIB_DIR=$(SolutionDir)lib\$(Configuration) --profile=$(SolutionDir)windows_x86_vs15.conanprofile --force</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -127,6 +130,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(TargetPath)" >
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
