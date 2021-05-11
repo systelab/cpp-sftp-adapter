@@ -20,7 +20,7 @@ The connect function tries to open a connection to the SFTP server, validate the
 * **pubKeyFile**: Path to the file that contains the public key to use during authentication
 * **privKeyFile**: Path to the file that contains the private key to use during authentication
 * **getPrivKeyPassPhraseFn**: Function that returns the passphrase used to access the private key from the privKeyFile
-* **serverFingerPrints**: List of valid server fingerprints. Fingerprints shall be given as SHA256 strings, with each byte separated by a colon and represented as 2 hex characters (_e.g.: 11:22:33:44:55:66:77:88:99:00:aa:bb:cc:dd:ee:ff:8c:c7:4a:f5:42:a6:4b:64:07:6b:03:ec:c8:0a:ab:9e_)
+* **serverFingerPrints**: List of valid server fingerprints. Fingerprints shall be given as SHA256 strings, with each byte separated by a colon and represented as 2 hex characters (_e.g.: `11:22:33:44:55:66:77:88:99:00:aa:bb:cc:dd:ee:ff:8c:c7:4a:f5:42:a6:4b:64:07:6b:03:ec:c8:0a:ab:9e_`)
 
 ### IConnection interface
     bool isConnected() const
