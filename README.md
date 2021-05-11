@@ -22,9 +22,13 @@ The connect function tries to open a connection to the SFTP server, validate the
 * **getPrivKeyPassPhraseFn**: Function that returns the passphrase used to access the private key from the privKeyFile
 * **serverFingerPrints**: List of valid server fingerprints. Fingerprints shall be given as SHA256 strings, with each byte separated by a colon and represented as 2 hex characters (_e.g.: `11:22:33:44:55:66:77:88:99:00:aa:bb:cc:dd:ee:ff:8c:c7:4a:f5:42:a6:4b:64:07:6b:03:ec:c8:0a:ab:9e_`)
 
+---
+
 ### IConnection interface
     bool isConnected() const
 Returns if the IConnection object is correctly connected or not
+
+---
 
 	bool upload(const std::string& srcFile, const std::string& dstFile)
 Creates a file called dstFile in the server to which the IConnection object is connected, and fills it with the contents of the srcFile.
@@ -32,18 +36,24 @@ Creates a file called dstFile in the server to which the IConnection object is c
 * **srcFile**: Path to the source file in the local filesystem
 * **dstFile**: Path to the target file in the SFTP server
 
+---
+
 	bool rename(const std::string& srcFile, const std::string& dstFile)
 Renames the server file srcFile to dstFile
 #### Parameters
 * **srcFile**: Path to the file to be renamed in the SFTP server
 * **dstFile**: New name of the file 
 
+---
+
     virtual void close()
 Closes the connection. After calling this function any call to isConnected() will return false.
 
-### SftpLibsshAdapter
+---
+
+## SftpLibsshAdapter
 The implementation using libssh, implements these two interfaces through the SFTPClient and SFTPConnection classes.
 
-### Usage
+## Usage
 To establish a connection with an SFTP server, instantiate the SFTPClient class and call the connect method to obtain a pointer to an instance of the connection.
 Then use the connection class methods to operate with the server.
