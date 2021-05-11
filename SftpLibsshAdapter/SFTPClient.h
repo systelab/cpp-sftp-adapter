@@ -1,8 +1,8 @@
 #pragma once
 
 #include "DLLImpExp.h"
-#include "ISFTPClientAdapter.h"
-#include "IConnection.h"
+#include "SFTPAdapterInterface/ISFTPClientAdapter.h"
+#include "SFTPAdapterInterface/IConnection.h"
 
 namespace systelab { namespace sftp {
 
