@@ -33,6 +33,23 @@ namespace systelab { namespace sftp {
 			return content;
 		}
 
+		struct sshKeyPtr
+		{
+			~sshKeyPtr() { ssh_key_free(sshKey); };
+			ssh_key sshKey = nullptr;
+		};
+
+		struct hashPtr
+		{
+			~hashPtr() { ssh_clean_pubkey_hash(&hash); };
+			unsigned char *hash = nullptr;
+		};
+
+		struct hexHashPtr
+		{
+			~hexHashPtr() { ssh_string_free_char(hexHash); };
+			char *hexHash = nullptr;
+		};
 	}
 
 	SFTPConnection::~SFTPConnection()
@@ -55,10 +72,10 @@ namespace systelab { namespace sftp {
 			sshAuthorize(username, pubKeyFile, privKeyFile, getPrivKeyPassPhraseFn());
 			sftpConnect();
 		}
-		catch (ISFTPClientAdapter::Exception exc)
+		catch (const Exception&)
 		{
 			close();
-			throw exc;
+			throw;
 		}
 	}
 
@@ -79,108 +96,59 @@ namespace systelab { namespace sftp {
 		}
 	}
 
+
+
 	void SFTPConnection::sshAuthorize(const std::string& username, const std::string& pubKeyFile,
 									  const std::string& privKeyFile, const std::string& privKeyPassPhrase)
 	{
-		ssh_key publickey = nullptr;
-		ssh_key privatekey = nullptr;
-		std::exception_ptr raisedException = nullptr;
+		sshKeyPtr publickey;
+		sshKeyPtr privatekey;
 
-		try
+		// IMPORTANT only base64 format public key are accepted as file content
+		std::string publicKeyFileContent = readFileContent(pubKeyFile);
+		if (ssh_pki_import_pubkey_base64(publicKeyFileContent.c_str(), SSH_KEYTYPE_RSA, &publickey.sshKey) != SSH_OK)
 		{
-			// IMPORTANT only base64 format public key are accepted as file content
-			std::string publicKeyFileContent = readFileContent(pubKeyFile);
-			if (ssh_pki_import_pubkey_base64(publicKeyFileContent.c_str(), SSH_KEYTYPE_RSA, &publickey) != SSH_OK)
-			{
-				throw InvalidPublicKeyException(ssh_get_error(m_sshSession));
-			}
-
-			if (ssh_userauth_try_publickey(m_sshSession, username.c_str(), publickey) != SSH_OK)
-			{
-				throw AuthenticationFailedException(ssh_get_error(m_sshSession));
-			}
-
-			// IMPORTANT only openSSH format private key file are accepted
-			if (ssh_pki_import_privkey_file(privKeyFile.c_str(), privKeyPassPhrase.c_str(), NULL, NULL, &privatekey) != SSH_AUTH_SUCCESS)
-			{
-				throw InvalidPrivateKeyException(ssh_get_error(m_sshSession));
-			}
-
-			if (ssh_userauth_publickey(m_sshSession, username.c_str(), privatekey) != SSH_OK)
-			{
-				throw AuthenticationFailedPrivateException(ssh_get_error(m_sshSession));
-			}
-		}
-		catch (ISFTPClientAdapter::Exception exc)
-		{
-			raisedException = std::current_exception();
-		}
-		
-		if (publickey)
-		{
-			ssh_key_free(publickey);
-		}
-		
-		if (privatekey)
-		{
-			ssh_key_free(privatekey);
+			throw InvalidPublicKeyException(ssh_get_error(m_sshSession));
 		}
 
-		if (raisedException)
+		if (ssh_userauth_try_publickey(m_sshSession, username.c_str(), publickey.sshKey) != SSH_AUTH_SUCCESS)
 		{
-			std::rethrow_exception(raisedException);
+			throw AuthenticationFailedException(ssh_get_error(m_sshSession));
+		}
+
+		// IMPORTANT only openSSH format private key file are accepted
+		if (ssh_pki_import_privkey_file(privKeyFile.c_str(), privKeyPassPhrase.c_str(), NULL, NULL, &privatekey.sshKey) != SSH_OK)
+		{
+			throw InvalidPrivateKeyException(ssh_get_error(m_sshSession));
+		}
+
+		if (ssh_userauth_publickey(m_sshSession, username.c_str(), privatekey.sshKey) != SSH_AUTH_SUCCESS)
+		{
+			throw AuthenticationFailedPrivateException(ssh_get_error(m_sshSession));
 		}
 	}
 
 	void SFTPConnection::verifySFTPServerIdentity(const std::vector<std::string>& serverFingerPrints)
 	{
-		ssh_key srv_pubkey = nullptr;
-		unsigned char *hash = nullptr;
-		char *hexHash = nullptr;
-		std::exception_ptr raisedException = nullptr;
+		sshKeyPtr srv_pubkey;
+		hashPtr hash_ptr;
+		hexHashPtr hexHash_ptr;
 
-		try
+		if (ssh_get_server_publickey(m_sshSession, &srv_pubkey.sshKey) != SSH_OK)
 		{
-			if (ssh_get_server_publickey(m_sshSession, &srv_pubkey) != SSH_OK)
-			{
-				throw InvalidServerPublicKeyException(ssh_get_error(m_sshSession));
-			}
+			throw InvalidServerPublicKeyException(ssh_get_error(m_sshSession));
+		}
 			
-			size_t hlen;
-			if (ssh_get_publickey_hash(srv_pubkey, SSH_PUBLICKEY_HASH_SHA256, &hash, &hlen) != SSH_OK)
-			{
-				throw InvalidServerPublicKeyException(ssh_get_error(m_sshSession));
-			}  
+		size_t hlen;
+		if (ssh_get_publickey_hash(srv_pubkey.sshKey, SSH_PUBLICKEY_HASH_SHA256, &hash_ptr.hash, &hlen) != SSH_OK)
+		{
+			throw InvalidServerPublicKeyException(ssh_get_error(m_sshSession));
+		}  
 
-			hexHash = ssh_get_hexa(hash, hlen);
-			if (std::find(serverFingerPrints.begin(), serverFingerPrints.end(), hexHash) == serverFingerPrints.end())
-			{
-				throw ServerFingerPrintNotAcceptedException(hexHash);
-			}
-		}
-		catch (ISFTPClientAdapter::Exception exc)
+		hexHash_ptr.hexHash = ssh_get_hexa(hash_ptr.hash, hlen);
+		if (std::find(serverFingerPrints.begin(), serverFingerPrints.end(), hexHash_ptr.hexHash) == serverFingerPrints.end())
 		{
-			raisedException = std::current_exception();
-		}
-		
-		if (srv_pubkey)
-		{
-			ssh_key_free(srv_pubkey);
-		}
-
-		if (hexHash)
-		{
-			ssh_string_free_char(hexHash);
-		}
-		
-		if (hash)
-		{
-			ssh_clean_pubkey_hash(&hash);
-		}
-
-		if (raisedException)
-		{
-			std::rethrow_exception(raisedException);
+			throw ServerFingerPrintNotAcceptedException(hexHash_ptr.hexHash);
 		}
 	}
 
