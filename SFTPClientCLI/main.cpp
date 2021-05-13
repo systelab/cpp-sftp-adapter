@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 	if (res == ResultErrorCodes::PROCESSED_OK)
 	{
 		std::cout << "Upload complete" << std::endl;
-		if (argc > 3)
+		if (argc > 4)
 		{
 			try
 			{
