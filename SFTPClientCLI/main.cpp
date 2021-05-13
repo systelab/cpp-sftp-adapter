@@ -20,6 +20,7 @@ void printUsage()
 	std::cout << "username" << std::endl;
 	std::cout << "pubKeyFile (only base64 format is accepted for the public key)" << std::endl;
 	std::cout << "privKeyFile (in openSSH format)" << std::endl;
+	std::cout << "passphrase for the privKeyFile" << std::endl;
 	std::cout << "serverFingerPrint1 (e.g.: 11:22:33:44:55:66:77:88:99:00:aa:bb:cc:dd:ee:ff:8c:c7:4a:f5:42:a6:4b:64:07:6b:03:ec:c8:0a:ab:9e)" << std::endl;
 	std::cout << "{serverFingerPrint2} (optional)" << std::endl;
 	std::cout << "{serverFingerPrint3} (optional)" << std::endl;
