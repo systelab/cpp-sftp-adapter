@@ -14,7 +14,9 @@ namespace systelab { namespace sftp {
 	{
 		// Used by function "sftp_open", parameter mode_t "mode"
 		// The mode_t accepted values are defined when #include <sys/types.h> but only for Linux (e.g.: S_IRWXU)
-		const mode_t  DEFAULT_FILE_PERMISSION = 0; 
+		const mode_t DEFAULT_FILE_PERMISSION = 0; 
+
+		const unsigned int MAX_FILE_READ_BUFFER = 1024;
 
 		std::string readFileContent(const std::string filename)
 		{
@@ -22,12 +24,14 @@ namespace systelab { namespace sftp {
 			try
 			{
 				std::ifstream file(filename);
+				if (file)
+				{
+					file.seekg(0, std::ios::end);
+					content.reserve((unsigned int)file.tellg());
+					file.seekg(0, std::ios::beg);
 
-				file.seekg(0, std::ios::end);
-				content.reserve((unsigned int)file.tellg());
-				file.seekg(0, std::ios::beg);
-
-				content.assign((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+					content.assign((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+				}
 			}
 			catch (...) {}
 			return content;
@@ -188,21 +192,27 @@ namespace systelab { namespace sftp {
 			throw SFTPCannotCreateRemoteFileException(ssh_get_error(m_sshSession));
 		}
 
-		// read the source file content
-		std::string contentClientFile = readFileContent(srcFile);
-		if (contentClientFile.empty())
+
+		char buffer[MAX_FILE_READ_BUFFER];
+		std::ifstream file(srcFile, std::ios::binary);
+		while (file)
 		{
-			sftp_close(serverFile);
-			throw SFTPCannotReadLocalFileException(ssh_get_error(m_sshSession));
+			file.read(buffer, sizeof(buffer));  // read the source file content
+			if (file.gcount() > 0)
+			{
+				size_t nwritten = sftp_write(serverFile, buffer, (size_t) file.gcount()); // upload the content on the server
+				if (nwritten != file.gcount())
+				{
+					throw SFTPCannotWriteRemoteFileException(ssh_get_error(m_sshSession));
+				}
+			}
+			else
+			{
+				throw SFTPCannotReadLocalFileException(ssh_get_error(m_sshSession));
+			}
 		}
 
-		// upload the content ot the server
-		int nWritten = sftp_write(serverFile, contentClientFile.c_str(), contentClientFile.size());
 		sftp_close(serverFile);
-		if (nWritten != contentClientFile.size())
-		{
-			throw SFTPCannotWriteRemoteFileException(ssh_get_error(m_sshSession));
-		}
 	}
 
 	void SFTPConnection::rename(const std::string& srcFile, const std::string& dstFile)
