@@ -25,7 +25,7 @@
 | Step # | Action                                                     | Expected                                                      |
 |--------|------------------------------------------------------------|---------------------------------------------------------------|
 | 1      | Call the .exe file with all the parameters (see example 1) | Console message states "Upload complete" and "File renamed"   |
-| 2      | In destination path                                        | A new file with the specified renameFilename has been created |
+| 2      | In destination path                                        | A new file with the specified renameFilename has been created with the same content than the fileToBeUploadedName file |
 
 Example 1:
 
