@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SFTPClientCLI", "SFTPClientCLI\SFTPClientCLI.vcxproj", "{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SftpLibsshAdapter", "SftpLibsshAdapter\SftpLibsshAdapter.vcxproj", "{09970DFD-6418-4D2B-B7BD-6631340032E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}.Debug|x86.ActiveCfg = Debug|Win32
+		{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}.Debug|x86.Build.0 = Debug|Win32
+		{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}.Release|x86.ActiveCfg = Release|Win32
+		{99A9C3C2-4C36-4A0C-A67F-0C023F78DD53}.Release|x86.Build.0 = Release|Win32
+		{09970DFD-6418-4D2B-B7BD-6631340032E5}.Debug|x86.ActiveCfg = Debug|Win32
+		{09970DFD-6418-4D2B-B7BD-6631340032E5}.Debug|x86.Build.0 = Debug|Win32
+		{09970DFD-6418-4D2B-B7BD-6631340032E5}.Release|x86.ActiveCfg = Release|Win32
+		{09970DFD-6418-4D2B-B7BD-6631340032E5}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EAA05368-F887-44AB-A7CA-805DB57B90D3}
+	EndGlobalSection
+EndGlobal

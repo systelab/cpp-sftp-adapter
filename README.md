@@ -1,1 +1,0 @@
-# cpp-sftp-adapter
