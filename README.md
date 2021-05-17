@@ -64,13 +64,13 @@ Renames the server file srcFile to dstFile
 * **SFTPCannotRenameRemoteFileException**: The file could not be renamed in the server
 ---
 
-    virtual void close()
+    void close()
 Closes the connection. After calling this function any call to isConnected() will return false.
 
 ---
 
 ## SftpLibsshAdapter
-The implementation using libssh, implements these two interfaces through the SFTPClient and SFTPConnection classes.
+The implementation using libssh (https://www.libssh.org/), implements these two interfaces through the SFTPClient and SFTPConnection classes.
 
 ## Usage
 To establish a connection with an SFTP server, instantiate the SFTPClient class and call the connect method to obtain a pointer to an instance of the connection.

@@ -16,6 +16,7 @@ The connectionDataFile shall be a text file with the following data:
     username
     pubKeyFile (only base64 format is accepted for the public key)
     privKeyFile (in openSSH format)
+    privKeyPassphrase
     serverFingerPrint1 (e.g.: 11:22:33:44:55:66:77:88:99:00:aa:bb:cc:dd:ee:ff:8c:c7:4a:f5:42:a6:4b:64:07:6b:03:ec:c8:0a:ab:9e)
     {serverFingerPrint2} (optional)
     {serverFingerPrint3} (optional)
@@ -23,7 +24,7 @@ The connectionDataFile shall be a text file with the following data:
 
 
 ## Return values
-* 0 if anything goes fine
+* 0 if everything goes fine
 * -1 if there is any trouble with the arguments
 * -2 if the connection with SFTP server fails
 * -3 if the file can't be uploaded to the server
