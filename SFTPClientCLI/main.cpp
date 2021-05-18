@@ -34,7 +34,7 @@ void printUsage()
 	std::cout << "	-4 if the file can't be renamed" << std::endl;
 }
 
-std::string readFileContent(const std::string filename)
+std::string readFileContent(const std::string& filename)
 {
 	std::string content = "";
 	try

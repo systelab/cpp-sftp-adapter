@@ -43,12 +43,12 @@ namespace systelab { namespace sftp {
 	}
 
 	void SFTPConnection::connect(const std::string& ip,
-									unsigned int port,
-									const std::string& username,
-									const std::string& pubKey,
-									const std::string& privKey,
-									const std::function<std::string()>& getPrivKeyPassPhraseFn,
-									const std::vector<std::string>& serverFingerPrints)
+								 unsigned short port,
+								 const std::string& username,
+								 const std::string& pubKey,
+								 const std::string& privKey,
+								 const std::function<std::string()>& getPrivKeyPassPhraseFn,
+								 const std::vector<std::string>& serverFingerPrints)
 	{
 		try
 		{

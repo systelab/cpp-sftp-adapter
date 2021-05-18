@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <exception>
+
 namespace systelab { namespace sftp { 
 
 	struct Exception : std::runtime_error

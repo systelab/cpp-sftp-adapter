@@ -12,7 +12,7 @@ namespace systelab { namespace sftp {
 	{
 	public:
 		virtual std::unique_ptr<IConnection> connect(const std::string& ip,
-													 unsigned int port,
+													 unsigned short port,
 													 const std::string& username,
 													 const std::string& pubKey,
 													 const std::string& privKey,
