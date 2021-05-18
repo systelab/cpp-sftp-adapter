@@ -14,8 +14,8 @@ The connectionDataFile shall be a text file with the following data:
     ip
     port
     username
-    pubKeyFile (only base64 format is accepted for the public key)
-    privKeyFile (in openSSH format)
+    pubKeyFile (base64 format)
+    privKeyFile (openSSH format)
     privKeyPassphrase
     serverFingerPrint1 (e.g.: 11:22:33:44:55:66:77:88:99:00:aa:bb:cc:dd:ee:ff:8c:c7:4a:f5:42:a6:4b:64:07:6b:03:ec:c8:0a:ab:9e)
     {serverFingerPrint2} (optional)

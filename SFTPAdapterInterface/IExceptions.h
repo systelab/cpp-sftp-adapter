@@ -12,7 +12,7 @@ namespace systelab { namespace sftp {
 
 	struct SSHSessionCannotCreateException : Exception
 	{
-		SSHSessionCannotCreateException(const std::string& message) : Exception("SSH session can not create: " + message) {}
+		SSHSessionCannotCreateException() : Exception("SSH session can not create") {}
 	};
 
 	struct ConectionFailedException : Exception
@@ -22,7 +22,7 @@ namespace systelab { namespace sftp {
 
 	struct InvalidPublicKeyException : Exception
 	{
-		InvalidPublicKeyException(const std::string& message) : Exception("The provided public key is invalid: " + message) {}
+		InvalidPublicKeyException() : Exception("The provided public key is invalid") {}
 	};
 
 	struct AuthenticationFailedException : Exception
@@ -32,7 +32,7 @@ namespace systelab { namespace sftp {
 
 	struct InvalidPrivateKeyException : Exception
 	{
-		InvalidPrivateKeyException(const std::string& message) : Exception("Invalid Private Key: " + message) {}
+		InvalidPrivateKeyException() : Exception("Invalid Private Key") {}
 	};
 
 	struct AuthenticationFailedPrivateException : Exception
@@ -42,7 +42,7 @@ namespace systelab { namespace sftp {
 
 	struct InvalidServerPublicKeyException : Exception
 	{
-		InvalidServerPublicKeyException(const std::string& message) : Exception("Invalid server publik key: " + message) {}
+		InvalidServerPublicKeyException() : Exception("Invalid server public key") {}
 	};
 
 	struct ServerFingerPrintNotAcceptedException : Exception
@@ -52,7 +52,7 @@ namespace systelab { namespace sftp {
 
 	struct SFTPSessionCannotCreateException : Exception
 	{
-		SFTPSessionCannotCreateException(const std::string& message) : Exception("SFTP session can not create: " + message) {}
+		SFTPSessionCannotCreateException() : Exception("SFTP session can not create") {}
 	};
 
 	struct SFTPSessionCannotInitException : Exception

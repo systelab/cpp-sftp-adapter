@@ -18,25 +18,6 @@ namespace systelab { namespace sftp {
 
 		const unsigned int MAX_FILE_READ_BUFFER = 1024;
 
-		std::string readFileContent(const std::string filename)
-		{
-			std::string content = "";
-			try
-			{
-				std::ifstream file(filename);
-				if (file)
-				{
-					file.seekg(0, std::ios::end);
-					content.reserve((unsigned int)file.tellg());
-					file.seekg(0, std::ios::beg);
-
-					content.assign((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-				}
-			}
-			catch (...) {}
-			return content;
-		}
-
 		struct sshKeyPtr
 		{
 			~sshKeyPtr() { ssh_key_free(sshKey); };
@@ -64,8 +45,8 @@ namespace systelab { namespace sftp {
 	void SFTPConnection::connect(const std::string& ip,
 									unsigned int port,
 									const std::string& username,
-									const std::string& pubKeyFile,
-									const std::string& privKeyFile,
+									const std::string& pubKey,
+									const std::string& privKey,
 									const std::function<std::string()>& getPrivKeyPassPhraseFn,
 									const std::vector<std::string>& serverFingerPrints)
 	{
@@ -73,7 +54,7 @@ namespace systelab { namespace sftp {
 		{
 			sshConnect(ip, port);
 			verifySFTPServerIdentity(serverFingerPrints);
-			sshAuthorize(username, pubKeyFile, privKeyFile, getPrivKeyPassPhraseFn());
+			sshAuthorize(username, pubKey, privKey, getPrivKeyPassPhraseFn());
 			sftpConnect();
 		}
 		catch (const Exception&)
@@ -88,7 +69,7 @@ namespace systelab { namespace sftp {
 		m_sshSession = ssh_new();
 		if (!m_sshSession)
 		{
-			throw SSHSessionCannotCreateException(ssh_get_error(m_sshSession));
+			throw SSHSessionCannotCreateException();
 		}
 
 		ssh_options_set(m_sshSession, SSH_OPTIONS_HOST, ip.c_str());
@@ -102,17 +83,15 @@ namespace systelab { namespace sftp {
 
 
 
-	void SFTPConnection::sshAuthorize(const std::string& username, const std::string& pubKeyFile,
-									  const std::string& privKeyFile, const std::string& privKeyPassPhrase)
+	void SFTPConnection::sshAuthorize(const std::string& username, const std::string& pubKey,
+									  const std::string& privKey, const std::string& privKeyPassPhrase)
 	{
 		sshKeyPtr publickey;
 		sshKeyPtr privatekey;
 
-		// IMPORTANT only base64 format public key are accepted as file content
-		std::string publicKeyFileContent = readFileContent(pubKeyFile);
-		if (ssh_pki_import_pubkey_base64(publicKeyFileContent.c_str(), SSH_KEYTYPE_RSA, &publickey.sshKey) != SSH_OK)
+		if (ssh_pki_import_pubkey_base64(pubKey.c_str(), SSH_KEYTYPE_RSA, &publickey.sshKey) != SSH_OK)
 		{
-			throw InvalidPublicKeyException(ssh_get_error(m_sshSession));
+			throw InvalidPublicKeyException();
 		}
 
 		if (ssh_userauth_try_publickey(m_sshSession, username.c_str(), publickey.sshKey) != SSH_AUTH_SUCCESS)
@@ -120,10 +99,9 @@ namespace systelab { namespace sftp {
 			throw AuthenticationFailedException(ssh_get_error(m_sshSession));
 		}
 
-		// IMPORTANT only openSSH format private key file are accepted
-		if (ssh_pki_import_privkey_file(privKeyFile.c_str(), privKeyPassPhrase.c_str(), NULL, NULL, &privatekey.sshKey) != SSH_OK)
+		if (ssh_pki_import_privkey_base64(privKey.c_str(), privKeyPassPhrase.c_str(), NULL, NULL, &privatekey.sshKey) != SSH_OK)
 		{
-			throw InvalidPrivateKeyException(ssh_get_error(m_sshSession));
+			throw InvalidPrivateKeyException();
 		}
 
 		if (ssh_userauth_publickey(m_sshSession, username.c_str(), privatekey.sshKey) != SSH_AUTH_SUCCESS)
@@ -140,13 +118,13 @@ namespace systelab { namespace sftp {
 
 		if (ssh_get_server_publickey(m_sshSession, &srv_pubkey.sshKey) != SSH_OK)
 		{
-			throw InvalidServerPublicKeyException(ssh_get_error(m_sshSession));
+			throw InvalidServerPublicKeyException();
 		}
 			
 		size_t hlen;
 		if (ssh_get_publickey_hash(srv_pubkey.sshKey, SSH_PUBLICKEY_HASH_SHA256, &hash_ptr.hash, &hlen) != SSH_OK)
 		{
-			throw InvalidServerPublicKeyException(ssh_get_error(m_sshSession));
+			throw InvalidServerPublicKeyException();
 		}  
 
 		hexHash_ptr.hexHash = ssh_get_hexa(hash_ptr.hash, hlen);
@@ -162,7 +140,7 @@ namespace systelab { namespace sftp {
 		m_sftpSession = sftp_new(m_sshSession);
 		if (!m_sftpSession)
 		{
-			throw SFTPSessionCannotCreateException(ssh_get_error(m_sshSession));
+			throw SFTPSessionCannotCreateException();
 		}
 
 		if (sftp_init(m_sftpSession) != SSH_OK)

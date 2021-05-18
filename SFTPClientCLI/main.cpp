@@ -18,8 +18,8 @@ void printUsage()
 	std::cout << "ip" << std::endl;
 	std::cout << "port" << std::endl;
 	std::cout << "username" << std::endl;
-	std::cout << "pubKeyFile (only base64 format is accepted for the public key)" << std::endl;
-	std::cout << "privKeyFile (in openSSH format)" << std::endl;
+	std::cout << "pubKeyFile (base64 format)" << std::endl;
+	std::cout << "privKeyFile (openSSH format)" << std::endl;
 	std::cout << "passphrase for the privKeyFile" << std::endl;
 	std::cout << "serverFingerPrint1 (e.g.: 11:22:33:44:55:66:77:88:99:00:aa:bb:cc:dd:ee:ff:8c:c7:4a:f5:42:a6:4b:64:07:6b:03:ec:c8:0a:ab:9e)" << std::endl;
 	std::cout << "{serverFingerPrint2} (optional)" << std::endl;
@@ -32,6 +32,25 @@ void printUsage()
 	std::cout << "	-2 if the connection with SFTP server fails" << std::endl;
 	std::cout << "	-3 if the file can't be uploaded to the server" << std::endl;
 	std::cout << "	-4 if the file can't be renamed" << std::endl;
+}
+
+std::string readFileContent(const std::string filename)
+{
+	std::string content = "";
+	try
+	{
+		std::ifstream file(filename);
+		if (file)
+		{
+			file.seekg(0, std::ios::end);
+			content.reserve((unsigned int)file.tellg());
+			file.seekg(0, std::ios::beg);
+
+			content.assign((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		}
+	}
+	catch (...) {}
+	return content;
 }
 
 enum ResultErrorCodes
@@ -92,8 +111,8 @@ int main(int argc, char *argv[])
 		return ResultErrorCodes::INVALID_PARAMETERS;
 	}
 	const std::string& username = fileContent[2];
-	const std::string& pubKeyFile = fileContent[3];
-	const std::string& privKeyFile = fileContent[4];
+	const std::string& pubKey = readFileContent(fileContent[3]);
+	const std::string& privKey = readFileContent(fileContent[4]);
 
 	privKeyPassPhrase = fileContent[5]; // It's assumed in a real implementation, some kind of obfuscation or encryptation process must be apply
 
@@ -108,7 +127,7 @@ int main(int argc, char *argv[])
 	std::unique_ptr<systelab::sftp::IConnection> conn;
 	try
 	{
-		conn = sftp.connect(ip, port, username, pubKeyFile, privKeyFile, getPrivKeyPassPhrase, validservers);
+		conn = sftp.connect(ip, port, username, pubKey, privKey, getPrivKeyPassPhrase, validservers);
 	}
 	catch (systelab::sftp::Exception exc)
 	{

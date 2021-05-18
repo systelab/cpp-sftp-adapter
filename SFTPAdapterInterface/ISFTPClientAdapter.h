@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stdexcept>
 #include <string>
 #include <vector>
 #include <memory>
@@ -15,8 +14,8 @@ namespace systelab { namespace sftp {
 		virtual std::unique_ptr<IConnection> connect(const std::string& ip,
 													 unsigned int port,
 													 const std::string& username,
-													 const std::string& pubKeyFile,
-													 const std::string& privKeyFile,
+													 const std::string& pubKey,
+													 const std::string& privKey,
 													 const std::function<std::string()>& getPrivKeyPassPhraseFn,
 													 const std::vector<std::string>& serverFingerPrints) = 0;
 	};
