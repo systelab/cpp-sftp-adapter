@@ -180,11 +180,6 @@ Error renaming the file on the server: Remote file can not be rename: SFTP serve
 | 1      | Call the .exe file with all the parameters (see example 1) | Console message states “Upload complete” and “File renamed”   |
 | 2      | In destination path                                        | The file that was originally in the destination folder has been overwritten and renamed |
 
-log7:
-```
-Upload complete
-Error renaming the file on the server: Remote file can not be rename: SFTP server: Already exists. 
-```
 
 # Scenario 10: Error case insuficcient rights on destination
 
