@@ -1,0 +1,155 @@
+def channel = "testing"
+def version = "0.0.0"
+
+pipeline
+{
+    agent
+    {
+        label 'lib-build'
+    }
+
+	parameters
+	{
+		string(	name: 'version',
+				description: 'Number of the version to build (must match the name of the tag that will be checked out)',
+				defaultValue: '0.0.0' )
+
+		booleanParam( name: 'stable',
+					  description: 'Show if generated library should be uploaded as stable or testing',
+					  defaultValue: false )
+	}
+
+    options
+    {
+        skipDefaultCheckout(true)
+        disableConcurrentBuilds()
+    }
+
+    stages
+    {
+        stage('Checkout')
+		{
+			steps
+			{
+                script 
+                {
+                    version = params.version
+                }
+				deleteDir()
+				checkout(
+                    changelog: true,
+                    poll: true,
+                    scm: [
+                        $class: 'GitSCM',
+                        branches: [[name: 'refs/tags/${version}']],
+                        extensions: scm.extensions + 
+                            [[
+                                $class: 'CloneOption',
+                                shallow: true,
+                                noTags: false,
+                                reference: '',
+                                timeout: 10
+                            ]],
+                        userRemoteConfigs: scm.userRemoteConfigs
+                    ]
+                )
+			}
+		}
+        stage('Read properties')
+        {
+            steps
+            {
+                script
+                {
+                    println 'Reading pipeline properties'
+                    props = readProperties file:'build/pipelines/pipeline.properties'
+                    props.each { propKey, propValue -> println "${propKey}: ${propValue}" }
+                    if (params.stable)
+					{
+						channel = "stable"
+					}                    
+                    println "Package version set to ${version}/${channel}"
+                }
+            }
+        }
+        stage('Build')
+        {
+            steps
+            {
+                script
+				{
+                    props.conanHeaderPackages.split(',').each
+					{ headerPkg ->
+						sh script: "conan export-pkg ${headerPkg}/conanfile.py ${headerPkg}/${version}@systelab/${channel} --build-folder ${headerPkg} --force", label: "Build conan package for ${headerPkg}"
+					}
+					props.projectConfigurations.split(',').each
+					{ config ->
+						props.buildProjects.split(',').each
+						{ project ->
+								sh script: "build/scripts/build.sh -p '${project}' -c '${config}' -r '$WORKSPACE' -s '${props.solutionPath}' -d '$VS150COMNTOOLS\\..\\IDE\\devenv.com' -v " + "${version}" + " -n " + "${channel}", label: "Build project '${project}' for '${config}'"
+						}
+					}
+				}           
+            }
+        }
+        stage('Static Code Analysis')
+		{
+			steps
+			{
+				sh "build/scripts/cppcheck_execute.sh -r '$WORKSPACE' -p '${props.cppCheckProjectPaths}' -k '${props.cppCheckProjectNames}'"
+			}			
+		}
+
+        stage('SonarQube Upload')
+		{
+			steps
+			{
+				script
+				{
+					try
+					{
+						scannerHome = tool 'SonarQubeScanner'
+						withSonarQubeEnv('SonarQube')
+						{
+							bat script: "${scannerHome}bin\\sonar-scanner.bat -Dproject.settings=sonar-project.properties -Dsonar.branch.name=${env.BRANCH_NAME} -Dsonar.projectVersion=${version}/${channel}", label: "SonarQube analysis"
+						}
+						timeout(time: 15, unit: 'MINUTES')
+						{
+							waitForQualityGate abortPipeline: false
+						}
+					}
+					catch (Exception err)
+					{
+						currentBuild.result = 'UNSTABLE'
+					}
+				}
+			}
+		}
+
+        stage('Deploy')
+		{
+			steps
+			{
+                script
+				{
+					props.conanUploadPackages.split(',').each
+					{ uploadPkg ->
+						sh script: "conan upload ${uploadPkg}/${version}@systelab/${channel} --all -r snow-conan-production-local --force", label: "Deploy conan packet for ${uploadPkg}"
+					}
+				}
+			}
+		}
+    }
+    post
+    {
+        always
+        {
+            publishCppcheck pattern: "report/*_cppcheck.xml", newThreshold: "5", threshold: "5", newFailureThreshold: "3", failureThreshold: "7", severityError: true, severityWarning: true
+            script
+			{
+				currentBuild.description = "${version}"
+			}
+        }
+    }
+    
+}

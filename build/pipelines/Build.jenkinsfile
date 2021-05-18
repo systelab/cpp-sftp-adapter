@@ -1,0 +1,150 @@
+def channel = "testing"
+def version = "0.0.0"
+
+pipeline
+{
+    agent
+    {
+        label 'lib-build'
+    }
+
+    triggers
+    {
+        pollSCM 'H/5 * * * *'
+    }
+	
+	parameters
+	{
+		booleanParam( name: 'uploadTestingPkg',
+					  description: 'Whether or not to upload testing conan package (Mind to remove it from repository first)',
+					  defaultValue: false )
+	}
+
+    options
+    {
+        skipDefaultCheckout(true)
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+    }
+
+    stages
+    {
+        stage('Checkout')
+		{
+			steps
+			{
+				deleteDir()
+				checkout(
+                    changelog: true,
+                    poll: true,
+                    scm: [
+                        $class: 'GitSCM',
+                        branches: scm.branches,
+                        extensions: scm.extensions + 
+                            [[
+                                $class: 'CloneOption',
+                                shallow: true,
+                                noTags: true,
+                                reference: '',
+                                timeout: 10
+                            ]],
+                        userRemoteConfigs: scm.userRemoteConfigs
+                    ]
+                )
+			}
+		}
+        stage('Read properties')
+        {
+            steps
+            {
+                script
+                {
+                    println 'Reading pipeline properties'
+                    props = readProperties file:'build/pipelines/pipeline.properties'
+                    props.each { propKey, propValue -> println "${propKey}: ${propValue}" }
+                }
+            }
+        }
+        stage('Build')
+        {
+            steps
+            {
+                script
+				{
+					props.conanHeaderPackages.split(',').each
+					{ headerPkg ->
+						sh script: "conan export-pkg ${headerPkg}/conanfile.py ${headerPkg}/${version}@systelab/${channel} --build-folder ${headerPkg} --force", label: "Build conan package for ${headerPkg}"
+					}
+					
+					props.projectConfigurations.split(',').each
+					{ config ->
+						props.buildProjects.split(',').each
+						{ project ->
+								sh script: "build/scripts/build.sh -p '${project}' -c '${config}' -r '$WORKSPACE' -s '${props.solutionPath}' -d '$VS150COMNTOOLS\\..\\IDE\\devenv.com' -v " + "${version}" + " -n " + "${channel}", label: "Build project '${project}' for '${config}'"
+						}
+					}
+				}           
+            }
+        }
+        stage('Static Code Analysis')
+		{
+			steps
+			{
+				sh "build/scripts/cppcheck_execute.sh -r '$WORKSPACE' -p '${props.cppCheckProjectPaths}' -k '${props.cppCheckProjectNames}'"
+			}			
+		}
+
+        stage('SonarQube Upload')
+		{
+			steps
+			{
+				script
+				{
+					try
+					{
+						scannerHome = tool 'SonarQubeScanner'
+						withSonarQubeEnv('SonarQube')
+						{
+							bat script: "${scannerHome}bin\\sonar-scanner.bat -Dproject.settings=sonar-project.properties -Dsonar.branch.name=${env.BRANCH_NAME} -Dsonar.projectVersion=${version}/${channel}", label: "SonarQube analysis"
+						}
+						timeout(time: 15, unit: 'MINUTES')
+						{
+							waitForQualityGate abortPipeline: false
+						}
+					}
+					catch (Exception err)
+					{
+						currentBuild.result = 'UNSTABLE'
+					}
+				}
+			}
+		}
+		
+		stage('Deploy')
+		{
+			when
+			{
+				expression { return params.uploadTestingPkg }
+			}
+			steps
+			{
+				script
+				{
+					props.conanUploadPackages.split(',').each
+					{ uploadPkg ->
+						sh script: "conan upload ${uploadPkg}/${version}@systelab/${channel} --all -r snow-conan-production-local --force", label: "Deploy conan packet for ${uploadPkg}"
+					}
+				}
+			}
+		}
+    }
+    post
+    {
+        always
+        {
+            // cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: "${props.codeCoverageReportFiles}", failNoReports: false, failUnhealthy: false, failUnstable: false, lineCoverageTargets: '30, 0, 0', maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+            publishCppcheck pattern: "report/*_cppcheck.xml", newThreshold: "5", threshold: "5", newFailureThreshold: "3", failureThreshold: "7", severityError: true, severityWarning: true
+        }
+    }
+    
+}

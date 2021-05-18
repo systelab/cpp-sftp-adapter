@@ -1,0 +1,13 @@
+int
+bin
+lib
+.vs
+*.user
+packages
+
+*.log
+conan.lock
+conaninfo.txt
+conanbuildinfo.txt
+conan_imports_manifest.txt
+graph_info.json
