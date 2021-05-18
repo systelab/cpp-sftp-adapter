@@ -1,20 +1,20 @@
 # Test execution summary
 
-| Scenario name                                                         | Result  |
-|-----------------------------------------------------------------------|---------|
-| Scenario 1: Establish connection, upload documents and rename them    | &#9745; |
-| Scenario 2: Cannot establish connection due to missing public key     | &#9745; |
-| Scenario 3: Cannot establish connection due to missing private key    | &#9745; |
-| Scenario 4: Cannot establish connection due to incorrect public key   | &#9745; |
-| Scenario 5: Cannot establish connection due to incorrect private key  | &#9745; |
-| Scenario 6: Cannot establish connection due to incorrect username     | &#9745; |
-| Scenario 7: Error case missing sourceFile                             | &#9745; |
-| Scenario 8: Error case duplicate renameFilename in destination        | &#9745; |
-| Scenario 9: Error case duplicate destinationFile name in destination  | &#9745; |
-| Scenario 10: Error case insuficcient rights on destination            | &#9745; |
-| Scenario 11: Cannot establish connection due to incorrect IP address (IP adress assigned)  | &#9745; |
-| Scenario 12: Cannot establish connection due to incorrect IP address (IP adress not assigned) | &#9745; |
-| Scenario 13: Cannot establish connection due to incorrect port        | &#9745; |
+| Scenario name                                                         | Informal Result  | Formal Result |
+|-----------------------------------------------------------------------|---------||
+| Scenario 1: Establish connection, upload documents and rename them    | &#9745; ||
+| Scenario 2: Cannot establish connection due to missing public key     | &#9745; ||
+| Scenario 3: Cannot establish connection due to missing private key    | &#9745; ||
+| Scenario 4: Cannot establish connection due to incorrect public key   | &#9745; ||
+| Scenario 5: Cannot establish connection due to incorrect private key  | &#9745; ||
+| Scenario 6: Cannot establish connection due to incorrect username     | &#9745; ||
+| Scenario 7: Error case missing sourceFile                             | &#9745; ||
+| Scenario 8: Error case duplicate renameFilename in destination        | &#9745; ||
+| Scenario 9: Error case duplicate destinationFile name in destination  | &#9745; ||
+| Scenario 10: Error case insuficcient rights on destination            | &#9745; ||
+| Scenario 11: Cannot establish connection due to incorrect IP address (IP adress assigned)  | &#9745; ||
+| Scenario 12: Cannot establish connection due to incorrect IP address (IP adress not assigned) | &#9745; ||
+| Scenario 13: Cannot establish connection due to incorrect port        | &#9745; ||
 
 # Scenario 1: Establish connection, upload documents and rename them
 
