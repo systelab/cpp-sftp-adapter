@@ -12,8 +12,9 @@
 | Scenario 8: Error case duplicate renameFilename in destination        | &#9745; |
 | Scenario 9: Error case duplicate destinationFile name in destination  | &#9745; |
 | Scenario 10: Error case insuficcient rights on destination            | &#9745; |
-| Scenario 11: Cannot establish connection due to incorrect IP address  | &#9745; |
-| Scenario 12: Cannot establish connection due to incorrect port        | &#9745; |
+| Scenario 11: Cannot establish connection due to incorrect IP address (IP adress assigned)  | &#9745; |
+| Scenario 12: Cannot establish connection due to incorrect IP address (IP adress not assigned) | &#9745; |
+| Scenario 13: Cannot establish connection due to incorrect port        | &#9745; |
 
 # Scenario 1: Establish connection, upload documents and rename them
 
@@ -200,13 +201,13 @@ Upload complete
 Error uploading the file: Remote file can not create: SFTP server: Access denied.  
 ```
 
-# Scenario 11: Cannot establish connection due to incorrect IP address
+# Scenario 11: Cannot establish connection due to incorrect IP address (IP adress assigned)
 
 **Preconditions**: 
 - Prepare an SFTP Server.
 - Make sure the client public key is added to the list of trusted keys in the server.
 - Generate a connectionDataFile with all **valid** parameters.
-- Edit the connectionDataFile to point to a different IP address.
+- Edit the connectionDataFile to point to an IP adress that is assigned (e.g. 192.168.1.1).
 
 | Step # | Action                                                     | Expected                                                      |
 |--------|------------------------------------------------------------|---------------------------------------------------------------|
@@ -219,6 +220,25 @@ Error connecting (check the connectionDataFile content)
 The obtained server finger print is not accepted:
 ```
 
+# Scenario 12: Cannot establish connection due to incorrect IP address (IP adress not assigned)
+
+**Preconditions**: 
+- Prepare an SFTP Server.
+- Make sure the client public key is added to the list of trusted keys in the server.
+- Generate a connectionDataFile with all **valid** parameters.
+- Edit the connectionDataFile to point to an IP adress that is not assigned (xxx.xxx.xxx.xxx).
+
+| Step # | Action                                                     | Expected                                                      |
+|--------|------------------------------------------------------------|---------------------------------------------------------------|
+| 1      | Call the .exe file with all the parameters (see example 1) | Console message states: (see log10)   |
+| 2      | In destination path                                        | No new file has been created |
+
+log10:
+```
+Error connecting (check the connectionDataFile content)
+Connection failed: Timeout connecting to xxx.xxx.xxx.xxx <-(here the target IP)
+```
+
 # Scenario 12: Cannot establish connection due to incorrect port
 
 **Preconditions**: 
@@ -229,10 +249,10 @@ The obtained server finger print is not accepted:
 
 | Step # | Action                                                     | Expected                                                      |
 |--------|------------------------------------------------------------|---------------------------------------------------------------|
-| 1      | Call the .exe file with all the parameters (see example 1) | Console message states: (see log10)   |
+| 1      | Call the .exe file with all the parameters (see example 1) | Console message states: (see log11)   |
 | 2      | In destination path                                        | No new file has been created |
 
-log10:
+log11:
 ```
 Error connecting (check the connectionDataFile content)
 Connection failed: Timeout connecting to 127.0.0.1
