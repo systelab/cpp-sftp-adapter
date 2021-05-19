@@ -1,5 +1,5 @@
 import os
-from conans import ConanFile
+from conans import ConanFile, tools
 
 class SFTPLibSSHAdapterConan(ConanFile):
 	name = "SFTPLibSSHAdapter"
