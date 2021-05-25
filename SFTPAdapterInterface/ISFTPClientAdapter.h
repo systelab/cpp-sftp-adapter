@@ -8,7 +8,7 @@
 
 namespace systelab { namespace sftp {
 
-	class SFTPLIBSSHADAPTER_API ISFTPClientAdapter
+	class ISFTPClientAdapter
 	{
 	public:
 		virtual ~ISFTPClientAdapter() = default;

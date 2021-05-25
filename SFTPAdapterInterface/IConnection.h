@@ -3,7 +3,7 @@
 #include <string>
 
 namespace systelab { namespace sftp {
-	class SFTPLIBSSHADAPTER_API IConnection
+	class IConnection
 	{
 	public:
 		virtual ~IConnection() = default;
