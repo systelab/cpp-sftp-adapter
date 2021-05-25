@@ -8,9 +8,10 @@
 
 namespace systelab { namespace sftp {
 
-	class ISFTPClientAdapter
+	class SFTPLIBSSHADAPTER_API ISFTPClientAdapter
 	{
 	public:
+		virtual ~ISFTPClientAdapter() = default;
 		virtual std::unique_ptr<IConnection> connect(const std::string& ip,
 													 unsigned short port,
 													 const std::string& username,
